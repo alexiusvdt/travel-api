@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+
 namespace TravelApi.Models
 {
   public class TravelApiContext : DbContext
@@ -21,8 +22,7 @@ namespace TravelApi.Models
         new Location { LocationId = 5, Name = "Miami", Country = "United States", Description = "Really hot weather and hotter beaches", Walkability = 2, PublicTransit = 1, Rating = 3},
         new Location { LocationId = 6, Name = "Cleveland", Country = "United States", Description = "trust me, just don't", Walkability = 1, PublicTransit = 1, Rating = 1},
         new Location { LocationId = 7, Name = "Tokyo", Country = "Japan", Description = "Lots of people, little space", Walkability = 5, PublicTransit = 5, Rating = 4}
-        
       );
+    }
   }
-}
-    
+}    
