@@ -16,7 +16,7 @@ You may also query certain attributes by using the following syntax in your GET 
 | Name | String | All cities matching the input string |
 | Walkability | Integer | All cities with a walking score of at least [input value] |
 | Rating | Integer | All cities with a rating of at least [input value] |
-| ------ | ------ | ----------------------------------------------------- |
+
     
 ## Examples
   * The following query will return all locations named "Portland":
@@ -54,5 +54,5 @@ You may also query certain attributes by using the following syntax in your GET 
     "rating": 5
     }
     ```
-  * additional information for the extended project (cors, tokens, etc) when implemented
+  # additional information for the extended project (cors, tokens, etc) when implemented
   
