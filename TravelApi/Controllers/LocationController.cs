@@ -13,25 +13,43 @@ namespace TravelApi.Controllers
     [ApiController]
     public class LocationController : ControllerBase
     {
-        private readonly TravelApiContext _context;
+        private readonly TravelApiContext _db;
 
-        public LocationController(TravelApiContext context)
+        public LocationController(TravelApiContext db)
         {
-            _context = context;
+            _db = db;
         }
 
-        // GET: api/Location
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Location>>> GetLocations()
+        public async Task<ActionResult<IEnumerable<Location>>> Get(string name, string country, int minimumWalkability, int minimumRating)
         {
-            return await _context.Locations.ToListAsync();
+        IQueryable<Location> query = _db.Locations.AsQueryable();
+
+        if (name != null)
+        {
+            query = query.Where(entry => entry.Name == name);
+        }
+        if (country != null)
+        {
+            query = query.Where(entry => entry.Country == country);
+        }
+        if (minimumWalkability > 0)
+        {
+            query = query.Where(entry => entry.Walkability >= minimumWalkability);
+        }
+        if (minimumRating > 0)
+        {
+            query = query.Where(entry => entry.Rating >= minimumRating);
+        }
+
+        return await query.ToListAsync();
         }
 
         // GET: api/Location/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Location>> GetLocation(int id)
         {
-            var location = await _context.Locations.FindAsync(id);
+            var location = await _db.Locations.FindAsync(id);
 
             if (location == null)
             {
@@ -51,11 +69,11 @@ namespace TravelApi.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(location).State = EntityState.Modified;
+            _db.Entry(location).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -77,8 +95,8 @@ namespace TravelApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Location>> PostLocation(Location location)
         {
-            _context.Locations.Add(location);
-            await _context.SaveChangesAsync();
+            _db.Locations.Add(location);
+            await _db.SaveChangesAsync();
 
             return CreatedAtAction("GetLocation", new { id = location.LocationId }, location);
         }
@@ -87,21 +105,21 @@ namespace TravelApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLocation(int id)
         {
-            var location = await _context.Locations.FindAsync(id);
+            var location = await _db.Locations.FindAsync(id);
             if (location == null)
             {
                 return NotFound();
             }
 
-            _context.Locations.Remove(location);
-            await _context.SaveChangesAsync();
+            _db.Locations.Remove(location);
+            await _db.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool LocationExists(int id)
         {
-            return _context.Locations.Any(e => e.LocationId == id);
+            return _db.Locations.Any(e => e.LocationId == id);
         }
     }
 }
