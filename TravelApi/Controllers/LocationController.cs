@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TravelApi.Models;
+using Newtonsoft.Json;
 
 namespace TravelApi.Controllers
 {
@@ -21,22 +22,22 @@ namespace TravelApi.Controllers
             _db = db;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Location>>> Get([FromQuery] LocationParameters locationParameters)
-        {
-            var locations = _repository.Location.GetLocations(locationParameters);
-            var metadata = new
-            {
-                locations.TotalCount,
-                locations.PageSize,
-                locations.CurrentPage,
-                locations.TotalPages,
-                locations.HasNext,
-                locations.HasPrevious
-            };
-            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
-            _logger.LogInfo($"Returned {locations.TotalCount} locations from database.");
-            return Ok(locations);
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Location>>> Get([FromQuery] Parameters parameters)
+    {
+      IQueryable<Location> query = _db.Locations.AsQueryable();
+      var locations = PagedList<Location>.ToPagedList(query.OrderBy(e=>e.Name), parameters.PageNumber, parameters.PageSize);
+      var metadata = new
+    {
+        locations.TotalCount,
+        locations.PageSize,
+        locations.CurrentPage,
+        locations.TotalPages,
+        locations.HasNext,
+        locations.HasPrevious
+    };
+    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+      return new ActionResult<IEnumerable<Location>>(locations);
 
         // if (name != null)
         // {
