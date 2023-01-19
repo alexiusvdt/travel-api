@@ -22,28 +22,40 @@ namespace TravelApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Location>>> Get(string name, string country, int minimumWalkability, int minimumRating)
+        public async Task<ActionResult<IEnumerable<Location>>> Get([FromQuery] LocationParameters locationParameters)
         {
-        IQueryable<Location> query = _db.Locations.AsQueryable();
+            var locations = _repository.Location.GetLocations(locationParameters);
+            var metadata = new
+            {
+                locations.TotalCount,
+                locations.PageSize,
+                locations.CurrentPage,
+                locations.TotalPages,
+                locations.HasNext,
+                locations.HasPrevious
+            };
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+            _logger.LogInfo($"Returned {locations.TotalCount} locations from database.");
+            return Ok(locations);
 
-        if (name != null)
-        {
-            query = query.Where(entry => entry.Name == name);
-        }
-        if (country != null)
-        {
-            query = query.Where(entry => entry.Country == country);
-        }
-        if (minimumWalkability > 0)
-        {
-            query = query.Where(entry => entry.Walkability >= minimumWalkability);
-        }
-        if (minimumRating > 0)
-        {
-            query = query.Where(entry => entry.Rating >= minimumRating);
-        }
+        // if (name != null)
+        // {
+        //     query = query.Where(entry => entry.Name == name);
+        // }
+        // if (country != null)
+        // {
+        //     query = query.Where(entry => entry.Country == country);
+        // }
+        // if (minimumWalkability > 0)
+        // {
+        //     query = query.Where(entry => entry.Walkability >= minimumWalkability);
+        // }
+        // if (minimumRating > 0)
+        // {
+        //     query = query.Where(entry => entry.Rating >= minimumRating);
+        // }
 
-        return await query.ToListAsync();
+        // return await query.ToListAsync();
         }
 
         // GET: api/Location/5
